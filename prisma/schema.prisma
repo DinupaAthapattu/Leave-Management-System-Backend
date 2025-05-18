@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id        Int           @id @default(autoincrement())
+  name      String
+  email     String        @unique
+  password  String
+  role      Role          @default(EMPLOYEE)
+  leaves    LeaveRequest[]  // Relation field to LeaveRequest
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model LeaveRequest {
+  id          Int            @id @default(autoincrement())
+  employee    Employee       @relation(fields: [employeeId], references: [id])
+  employeeId  Int
+  startDate   DateTime
+  endDate     DateTime
+  leaveType   LeaveType      @default(ANNUAL)
+  dayPart     LeaveDayPart   @default(FULL_DAY)
+  reason      String
+  status      LeaveStatus    @default(PENDING)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LeaveType {
+  ANNUAL
+  CASUAL_SICK
+  LIEU
+}
+
+enum LeaveDayPart {
+  FULL_DAY
+  FIRST_HALF
+  SECOND_HALF
+}
